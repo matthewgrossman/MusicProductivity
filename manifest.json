@@ -19,7 +19,7 @@
   },
 
   "background": {
-    "scripts": ["eventpage.js", "spotify_interface.js"],
+    "scripts": ["eventpage.js"],
     "persistent": false
   }
 }
