@@ -7,12 +7,8 @@
 
   "permissions": [
     "tabs",
-<<<<<<< HEAD
     "storage"
-=======
-    "storage",
     "https://play.spotify.com/*"
->>>>>>> 75737fcffa697da0582e12683f9370d869ea3ddb
   ],
 
   "options_page": "options.html",
