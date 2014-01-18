@@ -11,7 +11,8 @@ var wasted_time=0;
 var start_time; 
 var end_time;
 var interval = 4000;
-var timer = setInterval(function(){timeElapsed()}, interval);
+var timer;
+var timing = false;
 
 function didMatchURL(url, bannedURLS){
 	for (var i = 0; i < bannedURLS.length; ++i){
@@ -23,7 +24,7 @@ function didMatchURL(url, bannedURLS){
 };
 
 function timeElapsed(){
-	alert("time elapsed");
+	//alert("time elapsed");
 
 }
 
@@ -33,16 +34,20 @@ function stopTimers(){
 	wasted_time += elapsed; 
 	alert(elapsed);
 	alert(wasted_time);
-	window.clearInterval(timer);
+	timing = false;
+	clearTimeout(timer);
 };
 
 function checkTabChange(){
 	chrome.tabs.query( {"active" : true }, function(tabs){
 			if (didMatchURL(tabs[0].url, urls)) {
 				start_time = new Date().getTime() / 1000;
-				timer.setInterval(function(){timeElapsed()}, interval);
+				timing = true; 
+				timer = setTimeout(function(){timeElapsed()}, interval);
 			} else {
-				stopTimers();
+				if(timing){
+					stopTimers();
+				}
 			}
 	});
 };
