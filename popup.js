@@ -6,7 +6,6 @@ function saveOptions(state) {
 
 function restoreOptions() {
     chrome.storage.sync.get("state", function( lastState) {
-        console.log(lastState.state);
         if (lastState.state==0) {
             $("#off").prop('checked',true);
         } 
