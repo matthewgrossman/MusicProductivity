@@ -7,7 +7,7 @@
 // })
 var urls = ["facebook.com", "reddit.com"];
 
-var wasted_time; 
+var wasted_time=0; 
 var start_time; 
 var end_time;
 var interval = 4000;
@@ -22,18 +22,17 @@ function didMatchURL(url, bannedURLS){
 	} return false;
 };
 
-
 function timeElapsed(){
 	alert("time elapsed");
 
 }
-				
 
 function stopTimers(){
 	end_time = new Date().getTime() / 1000; 
 	var elapsed = end_time - start_time;
 	wasted_time += elapsed; 
 	alert(elapsed);
+	alert(wasted_time);
 	window.clearInterval(timer);
 };
 
