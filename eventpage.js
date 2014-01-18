@@ -16,8 +16,9 @@ var extremeTimer;
 var timing = false;
 var currentTabId;
 var extreme_enabled = false;
+var isEnabled = true;
 chrome.storage.sync.set({"timing": false});
-
+chrome.storage.sync.set({"wastedTime": 0});
 //chrome.storage.local.set({"random" : 3});
 
 
@@ -36,22 +37,20 @@ function timeElapsed(){
 }
 
 function stopTimers(){
-	chrome.storage.sync.set({"endTime" : new Date().getTime() / 1000}); 
-	var endTime;
-	chrome.storage.sync.get("endTime", function(et){
-		endTime = et.endTime;
-	});
-	var startTime;
+	console.log("in stopTimers");
+	var endTime = new Date().getTime() / 1000;
+	console.log("et: " + endTime);
+	chrome.storage.sync.set({"endTime" : endTime}); 
 	chrome.storage.sync.get("startTime", function(st){
 		startTime = st.startTime;
-	})
-	var elapsed = endTime - startTime;
-	console.log(elapsed);
-	chrome.storage.get("wastedTime", function(wt){
-		chrome.storage.sync.set({"wastedTime" : wt.wastedTime + elapsed});
-		console.log(wt.wastedTime);
+		var elapsed = endTime - startTime; 
+		console.log("elapsed: " + elapsed);
+		chrome.storage.sync.get("wastedTime", function(wt){
+			console.log("in get wasted time")
+			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
+			console.log("wasted time: " + wt.wastedTime);
+		});
 	});
-
 	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
 	clearTimeout(extremeTimer);
@@ -66,37 +65,60 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     currentTabId = activeInfo.tabId;
 });
 
+function test(){
+	alert("TEST");
+}
+
 function checkTabChange(){
+	console.log("in check tab");
 	//alert("call checkTabChange");
 	chrome.tabs.query( {"active" : true }, function(tabs){
 			//alert("past active");
 			if (didMatchURL(tabs[0].url, urls)) {
-				chrome.storage.sync.set({"startTime" : new Date().getTime() / 1000});
-				chrome.storage.sync.set({"timing" : true})		
+				console.log("on blocked site");
+				var st = new Date().getTime() / 1000;
+				chrome.storage.sync.set({"startTime" : st});
+				chrome.storage.sync.set({"timing" : true})	
+				chrome.storage.sync.get("timing", function(t){
+					console.log("timing");
+					console.log(t.timing);
+				});
 				timer = setTimeout(function(){timeElapsed()}, interval);
+				console.log("timer started");
 				if(extreme_enabled){
 					extremeTimer = setTimeout(function(){extremeTimeElapsed()}, 5000);
 				}	
 			} else {
+				var timing; 
 				chrome.storage.sync.get("timing", function(t){
+					timing = t.timing;
+					console.log(t.timing);
 					if(t.timing){
-						stopTimers();
+						console.log("called stop");
+						//test();
+						stopTimers();  //need to call in funtion so that timer has value; can't; figure out why
 					}
-				})
+				});
+				//console.log("timing   " + timing);
+				/*if(timing){
+					console.log("In if");
+					stopTimers();
+				}*/
 			}
 	});
 };
 
-chrome.tabs.onActivated.addListener(function(tabs){
-	checkTabChange();
-});
-
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-	if (changeInfo.status == "complete"){
+if(isEnabled){
+	chrome.tabs.onActivated.addListener(function(tabs){
 		checkTabChange();
-	}
-});
+	});	
 
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+		if (changeInfo.status == "complete"){
+			checkTabChange();
+		}	
+	});
+}
 
 
 
