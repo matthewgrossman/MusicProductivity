@@ -1,3 +1,5 @@
+var isEnabaled = false;
+
 function saveOptions(state) {
     chrome.storage.sync.set({'state' : state});
 };
@@ -15,14 +17,11 @@ function restoreOptions() {
 };
 
 
-function sendOptionsToTime( state) {
-
-}
-
 $(document).ready(function() {
     restoreOptions();
     $("input").click(function(e) {
         saveOptions( $(this).val() )
+        isEnabled = $(this).val()
     });
 });
 

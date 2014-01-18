@@ -1,21 +1,15 @@
-// chrome.tabs.onActivated.addListener(function(info){
-//         chrome.tabs.onUpdated.addListener(function())
-// }); 
 
-// chrome.tabs.onUpdated.addListener(function(tabs){
-//         alert("super");
-// })
 var urls = ["facebook.com", "reddit.com"];
-
-var wasted_time=0; 
-var start_time; 
-var end_time;
 var interval = 4000;
-var timer;
-var extremeTimer;
+var closeTabTime = 40000;
+var closeTabTimer;
 var timing = false;
 var currentTabId;
-var extreme_enabled = false;
+var closeTabEnabled = false;
+var isEnabled = true;
+chrome.storage.sync.set({"timing": false});
+chrome.storage.sync.set({"wastedTime": 0});
+
 
 function didMatchURL(url, bannedURLS){
         for (var i = 0; i < bannedURLS.length; ++i){
@@ -26,25 +20,29 @@ function didMatchURL(url, bannedURLS){
         } return false;
 };
 
-function timeElapsed(){
-        //alert("time elapsed");
+function pauseSpotify(){
+}
 
+function closeTab(){
+	chrome.tabs.remove(currentTabId);
 }
 
 function stopTimers(){
-        end_time = new Date().getTime() / 1000; 
-        var elapsed = end_time - start_time;
-        wasted_time += elapsed; 
-        alert(elapsed);
-        alert(wasted_time);
-        timing = false;
-        clearTimeout(timer);
-        clearTimeout(extremeTimer);
+	var endTime = new Date().getTime() / 1000;
+	chrome.storage.sync.set({"endTime" : endTime}); 
+	chrome.storage.sync.get("startTime", function(st){
+		startTime = st.startTime;
+		var elapsed = endTime - startTime; 
+		//console.log("elapsed: " + elapsed);
+		chrome.storage.sync.get("wastedTime", function(wt){
+			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
+			//console.log("wasted: " + wt.wastedTime);
+		});
+	});
+	chrome.storage.sync.set({"timing" : false});
+	clearTimeout(timer);
+	clearTimeout(closeTabTimer);
 };
-
-function extremeTimeElapsed(){
-        chrome.tabs.remove(currentTabId);
-}
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     currentTabId = activeInfo.tabId;
@@ -52,33 +50,37 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 //called on new tab or change tab
 function checkTabChange(){
-        //alert("call checkTabChange");
-        chrome.tabs.query( {"active" : true }, function(tabs){
-                        //alert("past active");
-                        if (didMatchURL(tabs[0].url, urls)) {
-                                start_time = new Date().getTime() / 1000;
-                                timing = true; 
-                                timer = setTimeout(function(){timeElapsed()}, interval);
-                                if(extreme_enabled){
-                                        extremeTimer = setTimeout(function(){extremeTimeElapsed()}, 5000);
-                                }        
-                        } else {
-                                //alert("else");
-                                //alert(timing);
-                                if(timing){
-                                        //alert("is timing");
-                                        stopTimers();
-                                }
-                        }
-        });
+	chrome.tabs.query( {"active" : true }, function(tabs){
+			if (didMatchURL(tabs[0].url, urls)) {
+				var st = new Date().getTime() / 1000;
+				chrome.storage.sync.set({"startTime" : st});
+				chrome.storage.sync.set({"timing" : true})	
+				timer = setTimeout(function(){timeElapsed()}, interval);
+				if(closeTabEnabled){
+					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
+				}	
+			} else {
+				chrome.storage.sync.get("timing", function(t){
+				//if a timer was on, stop it because the user switched to a good tab
+					if(t.timing){
+						stopTimers(); 
+					}
+				});
+			}
+	});
 };
 
-chrome.tabs.onActivated.addListener(function(tabs){
-        checkTabChange();
-});
+//if productivity mode is turned on, pay attention for bad activities
+if(isEnabled){
+	chrome.tabs.onActivated.addListener(function(tabs){
+		checkTabChange();
+	});	
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-        if (changeInfo.status == "complete"){
-                checkTabChange();
-        }
-});
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+		if (changeInfo.status == "complete"){
+			checkTabChange();
+		}	
+	});
+}
+
+
