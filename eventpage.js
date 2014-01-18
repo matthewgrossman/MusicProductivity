@@ -7,15 +7,19 @@
 // })
 var urls = ["facebook.com", "reddit.com"];
 
-var wasted_time=0; 
-var start_time; 
-var end_time;
+//localStorage["wastedTime"]; 
+//localStorage["startTime"]; 
+//localStorage["endTime"];
 var interval = 4000;
-var timer;
+//localStorage["timer"] = false; 
 var extremeTimer;
 var timing = false;
 var currentTabId;
 var extreme_enabled = false;
+chrome.storage.sync.set({"timing": false});
+
+//chrome.storage.local.set({"random" : 3});
+
 
 function didMatchURL(url, bannedURLS){
 	for (var i = 0; i < bannedURLS.length; ++i){
@@ -32,12 +36,23 @@ function timeElapsed(){
 }
 
 function stopTimers(){
-	end_time = new Date().getTime() / 1000; 
-	var elapsed = end_time - start_time;
-	wasted_time += elapsed; 
-	alert(elapsed);
-	alert(wasted_time);
-	timing = false;
+	chrome.storage.sync.set({"endTime" : new Date().getTime() / 1000}); 
+	var endTime;
+	chrome.storage.sync.get("endTime", function(et){
+		endTime = et.endTime;
+	});
+	var startTime;
+	chrome.storage.sync.get("startTime", function(st){
+		startTime = st.startTime;
+	})
+	var elapsed = endTime - startTime;
+	console.log(elapsed);
+	chrome.storage.get("wastedTime", function(wt){
+		chrome.storage.sync.set({"wastedTime" : wt.wastedTime + elapsed});
+		console.log(wt.wastedTime);
+	});
+
+	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
 	clearTimeout(extremeTimer);
 };
@@ -45,6 +60,7 @@ function stopTimers(){
 function extremeTimeElapsed(){
 	chrome.tabs.remove(currentTabId);
 }
+console.log("HI");
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     currentTabId = activeInfo.tabId;
@@ -55,19 +71,18 @@ function checkTabChange(){
 	chrome.tabs.query( {"active" : true }, function(tabs){
 			//alert("past active");
 			if (didMatchURL(tabs[0].url, urls)) {
-				start_time = new Date().getTime() / 1000;
-				timing = true; 
+				chrome.storage.sync.set({"startTime" : new Date().getTime() / 1000});
+				chrome.storage.sync.set({"timing" : true})		
 				timer = setTimeout(function(){timeElapsed()}, interval);
 				if(extreme_enabled){
 					extremeTimer = setTimeout(function(){extremeTimeElapsed()}, 5000);
 				}	
 			} else {
-				//alert("else");
-				//alert(timing);
-				if(timing){
-					//alert("is timing");
-					stopTimers();
-				}
+				chrome.storage.sync.get("timing", function(t){
+					if(t.timing){
+						stopTimers();
+					}
+				})
 			}
 	});
 };
