@@ -7,7 +7,8 @@
 
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "https://play.spotify.com/*"
   ],
 
   "options_page": "options.html",
@@ -18,7 +19,7 @@
   },
 
   "background": {
-    "scripts": ["eventpage.js"],
+    "scripts": ["eventpage.js", "spotify_interface.js"],
     "persistent": false
   }
 }
