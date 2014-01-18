@@ -7,7 +7,7 @@
 
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
     "https://play.spotify.com/*"
   ],
 
