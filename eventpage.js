@@ -134,6 +134,7 @@ function checkOnUpdate(tabId, changeInfo, tab){
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 	if(request.action == "stateOn"){
 		console.log("State On");
+        chrome.storage.sync.set({"wastedTime": 0});
 		checkTabChange();
 		chrome.tabs.onActivated.addListener( checkOnAct );	
 
@@ -147,5 +148,25 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 
+// Notifications
+var notification;
 
+chrome.extension.onMessage.addListener(
+function(request, sender, sendResponse) {
+    if (request.action == "stateOff"){
+        stopTimers();
+		chrome.storage.sync.get("wastedTime", function(wt){
+            console.log("wasted time as app is turned off");
+            console.log(wt.wastedTime);
+            if( wt.wastedTime > 5) {
+                notification = webkitNotifications.createHTMLNotifications(
+                    'Total Time Wasted:',
+                    wt.wastedTime
+                );
+                notification.show();
+            }
+        });
+    }
+});
+        
 
