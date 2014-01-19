@@ -221,6 +221,20 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 // Notifications
 /*var notification;
 
+function timeToHHMMSS( sec_num) {
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    else              {seconds = seconds | 0;}
+    var time    = "Hours:"+hours+"  Minutes:"+minutes+"  Seconds:"+seconds;
+    return time;
+}
+
+
 chrome.extension.onMessage.addListener(
 function(request, sender, sendResponse) {
     if (request.action == "stateOff"){
@@ -237,12 +251,14 @@ function(request, sender, sendResponse) {
            		console.log("wasted time as app is turned off");
            	 	console.log(wt.wastedTime);
             	if( wt.wastedTime > 5) {
+                    time = timeToHHMMSS( wt.wastedTime);
                		notification = webkitNotifications.createNotification(
                     'off.png',
                     'Total Time Wasted:',
-                    wt.wastedTime
+                    time 
                 );
                 notification.show();
+				setTimeout(function(){notification.cancel()}, 4000);
                 }
                 });
 			});
