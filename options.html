@@ -2,25 +2,38 @@
 	<head>
 		<title>My Test Extension Options</title>
 	
+	<script src="js/jquery.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="options.css">
-	<!-- Latest compiled and minified CSS -->
+
 	<link rel="stylesheet" href="css/bootstrap.css">
 
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="js/bootstrap.js"></script>
-
-
-	<script src="js/jquery.min.js"></script>
 	<script src="options.js"></script>
 	</head>	
 	<body>
 		<div class="container">
-			<textarea class="form-control" rows="8" id="input"></textarea>
+			<textarea class="form-control span6" rows="8" id="input"></textarea>
 		
 		<!--textarea id="input"></textarea></br-->
 		<!--button id="save">Save</button-->
-		<button type="submit" class="btn btn-default">Submit</button>
-	</div>
+			<div class="checkbox">
+				<label>
+					<input id="spotify" type="checkbox"> spotify
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input id="sound" type="checkbox"> play sound
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input id="close" type="checkbox"> close tab
+				</label>
+			</div>
+			<button id="save" type="submit" class="btn btn-default">Submit</button>
+		</div>
 	</body>
 
 
