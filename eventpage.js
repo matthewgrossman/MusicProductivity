@@ -1,5 +1,6 @@
-var interval = 4000;
-var closeTabTime = 6000;
+var spotifyTime = 30000;
+var closeTabTime = 30000;
+var soundTime = 30000
 var closeTabTimer;
 var timing = false;
 var currentTabId;
@@ -140,6 +141,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 		chrome.tabs.onUpdated.addListener( checkOnUpdate );
 	}
 	else if(request.action == "stateOff"){
+		chrome.storage.sync.set("wastedTime" : 0);
 		console.log("state off");
 		chrome.tabs.onActivated.removeListener(checkOnAct);
 		chrome.tabs.onUpdated.removeListener(checkOnUpdate);
