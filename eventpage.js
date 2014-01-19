@@ -1,5 +1,5 @@
 var interval = 4000;
-var closeTabTime = 40000;
+var closeTabTime = 6000;
 var closeTabTimer;
 var timing = false;
 var currentTabId;
@@ -12,6 +12,9 @@ chrome.storage.sync.set({"wastedTime": 0});
 function didMatchURL(url, bannedURLS){
         for (var i = 0; i < bannedURLS.length; ++i){
                 var didFind = url.search(bannedURLS[i]);
+                console.log("URL "+url);
+                console.log("bannedURLS "+ bannedURLS);
+                console.log("didFind: " + didFind);
                 if (didFind >= 0) {
                         return true;
                 }
@@ -29,10 +32,7 @@ function pauseSpotify(){
             }, 
             function(s_tab) {
                 console.log("running script");
-                console.log(s_tab[0]);
-                console.log(s_tab);
                 var spotify = s_tab[0]; // assume we found it
-
                 chrome.tabs.executeScript(
                     //code: 'console.log("fuck");'
                     spotify.id, {file: "spotify_interface.js"}
@@ -43,14 +43,17 @@ function pauseSpotify(){
 }
 
 function playSound(){
-	chrome.extension.sendMessage({action: "play})"});
+	console.log("in play sound");
+	chrome.extension.sendMessage({action: "play"});
 }
 
 function closeTab(){
+	console.log("in closeTab");
 	chrome.tabs.remove(currentTabId);
 }
 
 function stopTimers(){
+	console.log("stop");
 	var endTime = new Date().getTime() / 1000;
 	chrome.storage.sync.set({"endTime" : endTime}); 
 	chrome.storage.sync.get("startTime", function(st){
@@ -64,7 +67,7 @@ function stopTimers(){
 	});
 	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
-	clearTimeout(closeTabTimer);
+	//clearTimeout(closeTabTimer);
 };
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -73,6 +76,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 
 function doSomething(){
+	console.log("do something");
 	chrome.storage.sync.get("enableSpotify", function(eS){
 		if(eS.enableSpotify){
 			pauseSpotify();
@@ -98,10 +102,11 @@ function checkTabChange(){
 			var sites = ret.sites[0].split("\n");
 			var currentURL = tabs[0].url;
 			console.log(sites);
-
-			console.log(didMatchURL(currentURL, sites));
+			console.log(currentURL);
+			//console.log("did match: " + didMatchURL(currentURL, sites));
 
 			if (didMatchURL(currentURL, sites)) {
+				console.log(currentURL);
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
@@ -124,11 +129,13 @@ function checkTabChange(){
 //if productivity mode is turned on, pay attention for bad activities
 if(isEnabled){
 	chrome.tabs.onActivated.addListener(function(tabs){
+		console.log("Checking tabChange onActivated");
 		checkTabChange();
 	});	
 
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 		if (changeInfo.status == "complete"){
+			console.log("Checking tabChange onUpdated");
 			checkTabChange();
 		}	
 	});
