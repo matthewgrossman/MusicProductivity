@@ -21,6 +21,27 @@ function didMatchURL(url, bannedURLS){
 };
 
 function pauseSpotify(){
+	console.log("pause");
+	chrome.tabs.query( 
+        { "active" : true }, 
+        function(tabs){
+            chrome.tabs.query(
+            {
+                url: "https://play.spotify.com/*"
+            }, 
+            function(s_tab) {
+                console.log("running script");
+                console.log(s_tab[0]);
+                console.log(s_tab);
+                var spotify = s_tab[0]; // assume we found it
+
+                chrome.tabs.executeScript(
+                    //code: 'console.log("fuck");'
+                    spotify.id, {file: "spotify_interface.js"}
+                ); 
+            });
+            
+    });
 }
 
 function closeTab(){
@@ -33,10 +54,10 @@ function stopTimers(){
 	chrome.storage.sync.get("startTime", function(st){
 		startTime = st.startTime;
 		var elapsed = endTime - startTime; 
-		//console.log("elapsed: " + elapsed);
+		console.log("elapsed: " + elapsed);
 		chrome.storage.sync.get("wastedTime", function(wt){
 			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
-			//console.log("wasted: " + wt.wastedTime);
+			console.log("wasted: " + wt.wastedTime);
 		});
 	});
 	chrome.storage.sync.set({"timing" : false});
@@ -54,7 +75,7 @@ function checkTabChange(){
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
-				timer = setTimeout(function(){timeElapsed()}, interval);
+				timer = setTimeout(function(){pauseSpotify()}, interval);
 				if(closeTabEnabled){
 					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
 				}	
