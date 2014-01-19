@@ -17,6 +17,10 @@
   "browser_action": {
   },
 
+  "icons": {
+           "48": "logo.png"
+          },
+
   "background": {
     "scripts": ["js/jquery.min.js", "eventpage.js", "bg.js", "popup.js"],
     "persistent": false

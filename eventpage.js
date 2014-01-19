@@ -1,5 +1,5 @@
-var spotifyTime = 30000;
-var closeTabTime = 30000;
+var spotifyTime = 60000;
+var closeTabTime = 600000;
 var soundTime = 30000
 var closeTabTimer;
 var timing = false;
@@ -8,7 +8,7 @@ var currentTabId;
 //var isEnabled = true;
 chrome.storage.sync.set({"timing": false});
 //chrome.storage.sync.set({"wastedTime": 0});
-
+console.log("START");
 
 function didMatchURL(url, bannedURLS){
         for (var i = 0; i < bannedURLS.length; ++i){
@@ -48,23 +48,35 @@ function closeTab(){
 	chrome.tabs.remove(currentTabId);
 }
 
-function updateWastedTime(){
+function updateWastedTime(showN, clearWastedTime){
+	console.log("Update Wasted Time");
 	var endTime = new Date().getTime() / 1000;
 	chrome.storage.sync.set({"endTime" : endTime}); 
 	chrome.storage.sync.get("startTime", function(st){
 		startTime = st.startTime;
 		console.log("startTime: "+startTime);
 		var elapsed = endTime - startTime; 
+		console.log("Elapsed Time: " + elapsed);
 		chrome.storage.sync.get("wastedTime", function(wt){
 			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
+			if(showN){
+				console.log("Showing Notification from within UpdateWastedTime");
+				showNotification(wt.wastedTime+elapsed);
+				if(clearWastedTime){
+					chrome.storage.sync.set({"wastedTime" : 0});
+				}
+			}
 		});
 	});
 }
 
-function stopTimers(){
-	updateWastedTime();
+function stopTimers(showN, clearWastedTime){
+	console.log("Stop Timer");
+	updateWastedTime(showN, clearWastedTime);
+	console.log("Set Timing To False");
 	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
+	
 	//clearTimeout(closeTabTimer);
 };
 
@@ -95,6 +107,7 @@ function doSomething(){
 
 //called on new tab or change tab
 function checkTabChange(){
+	console.log("In CheckTabChange");
 	chrome.tabs.query( {"active" : true }, function(tabs){
 		chrome.storage.sync.get('sites', function(ret){
 			var sites = ret.sites[0].split("\n");
@@ -102,20 +115,28 @@ function checkTabChange(){
 			console.log(sites);
 			console.log(currentURL);
 			//console.log("did match: " + didMatchURL(currentURL, sites));
-
 			if (didMatchURL(currentURL, sites)) {
 				console.log(currentURL);
-				var st = new Date().getTime() / 1000;
-				chrome.storage.sync.set({"startTime" : st});
-				chrome.storage.sync.set({"timing" : true})	
-				timer = setTimeout(function(){doSomething()}, spotifyTime);
+				console.log("On A Forbidden Site");
+				chrome.storage.sync.get("timing", function(t){
+					if(!t.timing){
+						console.log("Start A New Timer");
+						timer = setTimeout(function(){doSomething()}, spotifyTime);
+						var st = new Date().getTime() / 1000;
+						chrome.storage.sync.set({"startTime" : st});
+						chrome.storage.sync.set({"timing" : true});	
+					}
+				});
+				
 				/*if(closeTabEnabled){
 					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
 				}*/	
 			} else {
+				console.log("Not On A Forbidden Site");
 				chrome.storage.sync.get("timing", function(t){
 				//if a timer was on, stop it because the user switched to a good tab
 					if(t.timing){
+						console.log("Timer Was On");
 						stopTimers(); 
 					}
 				});
@@ -136,6 +157,20 @@ function checkOnUpdate(tabId, changeInfo, tab){
 	}	
 }
 
+function showNotification(wastedTime){
+	console.log("Inside Show Notification");
+	console.log("Waste Time: "+wastedTime);
+	var notification;
+	if(wastedTime > 5) {
+		notification = webkitNotifications.createNotification(
+			"off.png",
+			"Total Time Wasted:",
+			wastedTime
+		);
+		notification.show();
+	}				
+}
+
 //if productivity mode is turned on, pay attention for bad activities
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 	if(request.action == "stateOn"){
@@ -144,17 +179,47 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 		checkTabChange();
 		chrome.tabs.onActivated.addListener( checkOnAct );	
 		chrome.tabs.onUpdated.addListener( checkOnUpdate );
+		chrome.storage.sync.set({"wastedTime" : 0});
 	}
 	else if(request.action == "stateOff"){
-		console.log("state off");
+		//chrome.storage.sync.set({"wastedTime" : 0});
+		console.log("State Off");
 		chrome.tabs.onActivated.removeListener(checkOnAct);
 		chrome.tabs.onUpdated.removeListener(checkOnUpdate);
+		//Account for the case where the user kills the app while on a bad page
+		chrome.storage.sync.get("timing", function(t){
+			var timing = t.timing; 
+			console.log(timing);
+			if(timing){
+				console.log("Timer Was On");
+				/*var endTime = new Date().getTime() / 1000;
+				chrome.storage.sync.get("startTime", function(sT){
+					startTime = sT.startTime;
+					var elapsed = endTime - startTime;
+					chrome.storage.sync.get("wastedTime", function(wT){
+						var finalWastedTime = wT.wastedTime + elapsed;
+						showNotification(finalWastedTime);
+					})
+				});*/
+				stopTimers(true, true);
+				//chrome.storage.sync.set({"wastedTime" : 0});
+			}
+			else {
+				console.log("Timer Was Off");
+				chrome.storage.sync.get("wastedTime", function(wT){
+					console.log("Wasted time: " + wT.wastedTime);
+					showNotification(wT.wastedTime);
+				});
+				chrome.storage.sync.set({"wastedTime" : 0});
+			}
+		});
+	
 	}
 });
 
 
 // Notifications
-var notification;
+/*var notification;
 
 chrome.extension.onMessage.addListener(
 function(request, sender, sendResponse) {
@@ -184,6 +249,6 @@ function(request, sender, sendResponse) {
 		});
 		
     }
-});
+});*/
         
 
