@@ -1,3 +1,5 @@
+var currentTabId;
+
 $(document).ready(function(){
     $("#save").click(function(){
       var text = $("#input").val();
@@ -11,8 +13,10 @@ $(document).ready(function(){
       chrome.storage.sync.set({'enableSpotify': spotifyClicked});
       chrome.storage.sync.set({'enablePlaySound': soundClicked});
       chrome.storage.sync.set({'enableCloseTab': tabClicked});
+
     });
 });
+
 
 // Restores select box state to saved value from localStorage.
 function restore_options() {
@@ -53,3 +57,8 @@ function restore_options() {
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
+
+
+
+
+

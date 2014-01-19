@@ -7,7 +7,7 @@ var currentTabId;
 
 //var isEnabled = true;
 chrome.storage.sync.set({"timing": false});
-chrome.storage.sync.set({"wastedTime": 0});
+//chrome.storage.sync.set({"wastedTime": 0});
 
 
 function didMatchURL(url, bannedURLS){
@@ -48,16 +48,21 @@ function closeTab(){
 	chrome.tabs.remove(currentTabId);
 }
 
-function stopTimers(){
+function updateWastedTime(){
 	var endTime = new Date().getTime() / 1000;
 	chrome.storage.sync.set({"endTime" : endTime}); 
 	chrome.storage.sync.get("startTime", function(st){
 		startTime = st.startTime;
+		console.log("startTime: "+startTime);
 		var elapsed = endTime - startTime; 
 		chrome.storage.sync.get("wastedTime", function(wt){
 			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
 		});
 	});
+}
+
+function stopTimers(){
+	updateWastedTime();
 	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
 	//clearTimeout(closeTabTimer);
@@ -103,7 +108,7 @@ function checkTabChange(){
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
-				timer = setTimeout(function(){doSomething()}, interval);
+				timer = setTimeout(function(){doSomething()}, spotifyTime);
 				/*if(closeTabEnabled){
 					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
 				}*/	
@@ -135,13 +140,12 @@ function checkOnUpdate(tabId, changeInfo, tab){
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 	if(request.action == "stateOn"){
 		console.log("State On");
+        chrome.storage.sync.set({"wastedTime": 0});
 		checkTabChange();
 		chrome.tabs.onActivated.addListener( checkOnAct );	
-
 		chrome.tabs.onUpdated.addListener( checkOnUpdate );
 	}
 	else if(request.action == "stateOff"){
-		chrome.storage.sync.set("wastedTime" : 0);
 		console.log("state off");
 		chrome.tabs.onActivated.removeListener(checkOnAct);
 		chrome.tabs.onUpdated.removeListener(checkOnUpdate);
@@ -149,5 +153,37 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 
+// Notifications
+var notification;
 
+chrome.extension.onMessage.addListener(
+function(request, sender, sendResponse) {
+    if (request.action == "stateOff"){
+        //updateWastedTime();
+        var endTime = new Date().getTime() / 1000;
+		chrome.storage.sync.set({"endTime" : endTime}); 
+		chrome.storage.sync.get("startTime", function(st){
+			startTime = st.startTime;
+			console.log("startTime: "+startTime);
+			var elapsed = endTime - startTime; 
+			chrome.storage.sync.get("wastedTime", function(wt){
+				chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
+				chrome.storage.sync.get("wastedTime", function(wt){
+           		console.log("wasted time as app is turned off");
+           	 	console.log(wt.wastedTime);
+            	if( wt.wastedTime > 5) {
+               		notification = webkitNotifications.createNotification(
+                    'off.png',
+                    'Total Time Wasted:',
+                    wt.wastedTime
+                );
+                notification.show();
+                }
+                });
+			});
+		});
+		
+    }
+});
+        
 

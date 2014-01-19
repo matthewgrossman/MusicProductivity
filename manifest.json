@@ -8,7 +8,8 @@
   "permissions": [
     "tabs",
     "storage",
-    "https://play.spotify.com/*"
+    "https://play.spotify.com/*",
+    "notifications"
   ],
 
   "options_page": "options.html",
