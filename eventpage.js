@@ -31,6 +31,9 @@ function pauseSpotify(){
                 url: "https://play.spotify.com/*"
             }, 
             function(s_tab) {
+            	if (!s_tab) {
+            		return;
+            	}
                 console.log("running script");
                 var spotify = s_tab[0]; // assume we found it
                 chrome.tabs.executeScript(
