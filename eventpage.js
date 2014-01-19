@@ -3,8 +3,8 @@ var closeTabTime = 6000;
 var closeTabTimer;
 var timing = false;
 var currentTabId;
-var closeTabEnabled = false;
-var isEnabled = true;
+
+//var isEnabled = true;
 chrome.storage.sync.set({"timing": false});
 chrome.storage.sync.set({"wastedTime": 0});
 
@@ -119,16 +119,28 @@ function checkTabChange(){
 };
 
 //if productivity mode is turned on, pay attention for bad activities
-if(isEnabled){
-	chrome.tabs.onActivated.addListener(function(tabs){
-		checkTabChange();
-	});	
-
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-		if (changeInfo.status == "complete"){
+chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
+	if(request.action == "stateOn"){
+		chrome.tabs.onActivated.addListener(function(tabs){
+			console.log("Checking tabChange onActivated");
 			checkTabChange();
-		}	
-	});
-}
+		});	
+
+		chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+			if (changeInfo.status == "complete"){
+				console.log("Checking tabChange onUpdated");
+				checkTabChange();
+			}	
+		});
+	}
+});
+
+chrome.extension.onMessage.addListener(function(request, sender, sendResponse)){
+	if(request.action == "stateOff"){
+		chrome.tabs.onActivated.removeListener();
+		chrome.tabs.onUpdated.removeListener();
+	}
+});
+
 
 
