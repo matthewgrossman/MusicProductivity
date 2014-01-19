@@ -1,3 +1,4 @@
+// Audio Element
 var audioElement = document.createElement('audio');
 audioElement.setAttribute("preload", "auto");
 audioElement.autobuffer = true;
@@ -14,3 +15,4 @@ function(request, sender, sendResponse) {
     audioElement.play();
     }
 });
+       
