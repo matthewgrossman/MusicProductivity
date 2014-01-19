@@ -12,17 +12,13 @@ chrome.storage.sync.set({"wastedTime": 0});
 function didMatchURL(url, bannedURLS){
         for (var i = 0; i < bannedURLS.length; ++i){
                 var didFind = url.search(bannedURLS[i]);
-                console.log("URL "+url);
-                console.log("bannedURLS "+ bannedURLS);
-                console.log("didFind: " + didFind);
-                if (didFind >= 0) {
+                if (didFind >= 0 && bannedURLS[i] != "") {
                         return true;
                 }
         } return false;
 };
 
 function pauseSpotify(){
-	console.log("pause");
 	chrome.tabs.query( 
         { "active" : true }, 
         function(tabs){
@@ -31,10 +27,11 @@ function pauseSpotify(){
                 url: "https://play.spotify.com/*"
             }, 
             function(s_tab) {
-                console.log("running script");
+            	if (!s_tab) {
+            		return;
+            	}
                 var spotify = s_tab[0]; // assume we found it
                 chrome.tabs.executeScript(
-                    //code: 'console.log("fuck");'
                     spotify.id, {file: "spotify_interface.js"}
                 ); 
             });
@@ -43,26 +40,21 @@ function pauseSpotify(){
 }
 
 function playSound(){
-	console.log("in play sound");
 	chrome.extension.sendMessage({action: "play"});
 }
 
 function closeTab(){
-	console.log("in closeTab");
 	chrome.tabs.remove(currentTabId);
 }
 
 function stopTimers(){
-	console.log("stop");
 	var endTime = new Date().getTime() / 1000;
 	chrome.storage.sync.set({"endTime" : endTime}); 
 	chrome.storage.sync.get("startTime", function(st){
 		startTime = st.startTime;
 		var elapsed = endTime - startTime; 
-		console.log("elapsed: " + elapsed);
 		chrome.storage.sync.get("wastedTime", function(wt){
 			chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
-			console.log("wasted: " + wt.wastedTime);
 		});
 	});
 	chrome.storage.sync.set({"timing" : false});
