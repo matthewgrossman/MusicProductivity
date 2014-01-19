@@ -2,38 +2,76 @@
 	<head>
 		<title>My Test Extension Options</title>
 	
-	<script src="js/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="options.css">
+		<script src="js/jquery.min.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="options.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 
-	<link rel="stylesheet" href="css/bootstrap.css">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="js/bootstrap.js"></script>
-	<script src="options.js"></script>
+		<script src="js/bootstrap.js"></script>
+		<script src="options.js"></script>
 	</head>	
 	<body>
 		<div class="container">
-			<textarea class="form-control span6" rows="8" id="input"></textarea>
-		
-		<!--textarea id="input"></textarea></br-->
-		<!--button id="save">Save</button-->
-			<div class="checkbox">
-				<label>
-					<input id="spotify" type="checkbox"> spotify
-				</label>
+			<div class="row">
+				<div class="col-lg-12">
+					<h4>
+						Welcome to <a href="https://github.com/matthewgrossman/MusicProductivity">restraint</a>! Think you waste too much time on a certain website? Add it to the blacklisted urls to the text area below!
+						On the right hand side, choose which punishments you want to receive after wasting time. You can toggle productivity mode by clicking
+						the icon in the top right. Remember to click save after modifying the blacklisted sites or punishments!
+					</h4>
+				</div>
 			</div>
-			<div class="checkbox">
-				<label>
-					<input id="sound" type="checkbox"> play sound
-				</label>
+			<div class="row">
+				<div class="col-lg-6">
+					<textarea id="input" class="form-control" rows="10"></textarea>
+					<button id="save" type="submit" class="btn btn-primary col-lg-12"> Save </button>
+				</div>
+				<div class="col-lg-6">
+					<div class="checkbox">
+						<label>
+							<input id="sound" type="checkbox"> Play annoying sounds, 30s
+						</label>
+					</div>
+					<div class="checkbox">
+						<label>
+							<input id="close" type="checkbox"> Close wasteful tab, 10m
+						</label>
+					</div>
+					<div class="checkbox">
+						<label>
+							<input id="spotify" type="checkbox"> Pause spotify web player, 60s
+						</label>
+					</div>
+					<div class="col-lg-12">
+					<h6>
+						Created by <a href="https://github.com/kenzshell">Mackenzie Shelley</a>, <a href="https://github.com/MoDaum">Maureen Daum</a>, <a href="https://github.com/matthewgrossman/">Matthew Grossman</a>, and <a href="https://github.com/gbellack">Garrison Bellack</a> at MHacks III.
+						Special shoutout to <a href="https://github.com/ottosipe">Otto Sipe</a> for being a total boss sensei and walking us through the whole project.
+
+					</h6>
+				</div>
+				</div>
 			</div>
-			<div class="checkbox">
-				<label>
-					<input id="close" type="checkbox"> close tab
-				</label>
-			</div>
-			<button id="save" type="submit" class="btn btn-default">Submit</button>
 		</div>
+
+
+<!-- 		<textarea class="form-control span6" rows="8" id="input"></textarea>
+		<div class="checkbox">
+			<label>
+				<input id="spotify" type="checkbox"> spotify
+			</label>
+		</div>
+		<div class="checkbox">
+			<label>
+				<input id="sound" type="checkbox"> play sound
+			</label>
+		</div>
+		<div class="checkbox">
+			<label>
+				<input id="close" type="checkbox"> close tab
+			</label>
+		</div>
+		<button id="save" type="submit" class="btn btn-default">Submit</button>
+		</div> -->
 	</body>
 
 
