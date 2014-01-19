@@ -1,6 +1,8 @@
 var isEnabaled = false;
 var state = 0;
 
+
+
 function saveOptions(state) {
     chrome.storage.sync.set({'state' : state});
 };

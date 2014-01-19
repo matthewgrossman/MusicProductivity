@@ -121,6 +121,7 @@ function checkTabChange(){
 //if productivity mode is turned on, pay attention for bad activities
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 	if(request.action == "stateOn"){
+		console.log("State On");
 		chrome.tabs.onActivated.addListener(function(tabs){
 			console.log("Checking tabChange onActivated");
 			checkTabChange();
@@ -133,14 +134,13 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 			}	
 		});
 	}
-});
-
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse)){
-	if(request.action == "stateOff"){
+	else if(request.action == "stateOff"){
+		console.log("state off");
 		chrome.tabs.onActivated.removeListener();
 		chrome.tabs.onUpdated.removeListener();
 	}
 });
+
 
 
 
