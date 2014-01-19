@@ -69,6 +69,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     currentTabId = activeInfo.tabId;
 });
 
+//called on new tab or change tab
 function checkTabChange(){
 	chrome.tabs.query( {"active" : true }, function(tabs){
 			if (didMatchURL(tabs[0].url, urls)) {
