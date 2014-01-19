@@ -163,7 +163,7 @@ function(request, sender, sendResponse) {
             console.log("wasted time as app is turned off");
             console.log(wt.wastedTime);
             if( wt.wastedTime > 5) {
-                notification = webkitNotifications.createHTMLNotifications(
+                notification = webkitNotifications.createHTMLNotification(
                     'Total Time Wasted:',
                     wt.wastedTime
                 );
