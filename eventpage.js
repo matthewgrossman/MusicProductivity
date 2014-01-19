@@ -142,7 +142,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 		chrome.tabs.onUpdated.addListener( checkOnUpdate );
 	}
 	else if(request.action == "stateOff"){
-		chrome.storage.sync.set("wastedTime" : 0);
 		console.log("state off");
 		chrome.tabs.onActivated.removeListener(checkOnAct);
 		chrome.tabs.onUpdated.removeListener(checkOnUpdate);
