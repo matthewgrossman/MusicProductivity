@@ -1,7 +1,6 @@
 var spotifyTime = 60000;
 var closeTabTime = 600000;
-//var rickRollTime = 1800000;
-var rickRollTime = 5000;
+var rickRollTime = 120000;
 var soundTime = 30000
 var closeTabTimer;
 var spotifyTimer;
