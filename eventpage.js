@@ -107,7 +107,7 @@ function checkTabChange(){
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
-				timer = setTimeout(function(){doSomething()}, interval);
+				timer = setTimeout(function(){doSomething()}, spotifyTime);
 				/*if(closeTabEnabled){
 					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
 				}*/	
