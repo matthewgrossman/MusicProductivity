@@ -8,4 +8,4 @@ Current features include:
     - alert user with annoying sound
     - close current tab
 
-GIRLZ RULE BOYZ DROOL
+MkZ thinks shes C00L
