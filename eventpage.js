@@ -71,6 +71,26 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     currentTabId = activeInfo.tabId;
 });
 
+
+function doSomething(){
+	chrome.storage.sync.get("enableSpotify", function(eS){
+		if(eS.enableSpotify){
+			pauseSpotify();
+		}
+	});
+	chrome.storage.sync.get("enablePlaySound", function(pS){
+		if(pS.enablePlaySound){
+			playSound();
+		}
+	});
+	chrome.storage.sync.get("enableCloseTab", function(cT){
+		if(cT.enableCloseTab){
+			closeTab();
+		}
+	});
+
+}
+
 //called on new tab or change tab
 function checkTabChange(){
 	chrome.tabs.query( {"active" : true }, function(tabs){
@@ -85,10 +105,10 @@ function checkTabChange(){
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
-				timer = setTimeout(function(){pauseSpotify()}, interval);
-				if(closeTabEnabled){
+				timer = setTimeout(function(){doSomething()}, interval);
+				/*if(closeTabEnabled){
 					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
-				}	
+				}*/	
 			} else {
 				chrome.storage.sync.get("timing", function(t){
 				//if a timer was on, stop it because the user switched to a good tab
