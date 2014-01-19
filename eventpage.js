@@ -1,5 +1,3 @@
-
-var urls = ["facebook.com", "reddit.com"];
 var interval = 4000;
 var closeTabTime = 40000;
 var closeTabTimer;
@@ -76,7 +74,14 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 //called on new tab or change tab
 function checkTabChange(){
 	chrome.tabs.query( {"active" : true }, function(tabs){
-			if (didMatchURL(tabs[0].url, urls)) {
+		chrome.storage.sync.get('sites', function(ret){
+			var sites = ret.sites[0].split("\n");
+			var currentURL = tabs[0].url;
+			console.log(sites);
+
+			console.log(didMatchURL(currentURL, sites));
+
+			if (didMatchURL(currentURL, sites)) {
 				var st = new Date().getTime() / 1000;
 				chrome.storage.sync.set({"startTime" : st});
 				chrome.storage.sync.set({"timing" : true})	
@@ -92,6 +97,7 @@ function checkTabChange(){
 					}
 				});
 			}
+		});	
 	});
 };
 

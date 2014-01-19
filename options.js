@@ -2,8 +2,8 @@ $(document).ready(function(){
     $("#save").click(function(){
       var text = $("#input").val();
       var sites = text.split(" ");
+      console.log(sites);
       chrome.storage.sync.set({'sites' : sites});
-
     });
 });
 
