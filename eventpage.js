@@ -44,6 +44,10 @@ function pauseSpotify(){
     });
 }
 
+function playSound(){
+	chrome.extension.sendMessage({action: "play})"});
+}
+
 function closeTab(){
 	chrome.tabs.remove(currentTabId);
 }
