@@ -8,4 +8,4 @@ Current features include:
     - alert user with annoying sound
     - close current tab
 
-If Matt shaved you could make a rug out of that hair - Kayne West
+GIRLZ RULE BOYZ DROOL
