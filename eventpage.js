@@ -179,6 +179,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 				chrome.storage.sync.get("wastedTime", function(wT){
 					console.log("Wasted time: " + wT.wastedTime);
 					showNotification(wT.wastedTime);
+
+					setTimeout(function(){showNotification(wT.wastedTime)}, 1000);
 				});
 				chrome.storage.sync.set({"wastedTime" : 0});
 			}
