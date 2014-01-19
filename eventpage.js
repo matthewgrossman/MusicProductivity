@@ -1,7 +1,12 @@
 var spotifyTime = 60000;
 var closeTabTime = 600000;
+//var rickRollTime = 1800000;
+var rickRollTime = 5000;
 var soundTime = 30000
 var closeTabTimer;
+var spotifyTimer;
+var soundTimer;
+var rickRollTimer;
 var timing = false;
 var currentTabId;
 
@@ -73,7 +78,10 @@ function stopTimers(showN, clearWastedTime){
 	updateWastedTime(showN, clearWastedTime);
 	console.log("Set Timing To False");
 	chrome.storage.sync.set({"timing" : false});
-	clearTimeout(timer);
+	clearTimeout(spotifyTimer);
+	clearTimeout(closeTabTimer);
+	clearTimeout(soundTimer);
+	clearTimeout(rickRollTimer);
 };
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -83,22 +91,42 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 function doSomething(){
 	console.log("do something");
-	chrome.storage.sync.get("enableSpotify", function(eS){
+	spotifyTimer = setTimeout(function(){
+		chrome.storage.sync.get("enableSpotify", function(eS){
 		if(eS.enableSpotify){
 			pauseSpotify();
 		}
-	});
-	chrome.storage.sync.get("enablePlaySound", function(pS){
-		if(pS.enablePlaySound){
-			playSound();
-		}
-	});
-	chrome.storage.sync.get("enableCloseTab", function(cT){
-		if(cT.enableCloseTab){
-			closeTab();
-		}
-	});
+		});
+	}, spotifyTime);
+	
+	soundTimer = setTimeout(function(){
+		chrome.storage.sync.get("enablePlaySound", function(pS){
+			if(pS.enablePlaySound){
+				playSound();
+			}
+		});
+	}, soundTime);
 
+	closeTabTimer = setTimeout(function(){
+		chrome.storage.sync.get("enableCloseTab", function(cT){
+			if(cT.enableCloseTab){
+				closeTab();
+			}
+		});
+	}, closeTabTime);
+
+	rickRollTimer = setTimeout(function(){
+		chrome.storage.sync.get("enableRickRoll", function(rR){
+			if(rR.enableRickRoll){
+				rickRoll();
+			}
+		});
+	}, rickRollTime);
+}
+
+function rickRoll(){
+	var rickRollUrl = "http://www.youtube.com/watch?v=BROWqjuTM0g";
+	chrome.tabs.create({url : rickRollUrl});
 }
 
 //called on new tab or change tab
@@ -117,7 +145,8 @@ function checkTabChange(){
 				chrome.storage.sync.get("timing", function(t){
 					if(!t.timing){
 						console.log("Start A New Timer");
-						timer = setTimeout(function(){doSomething()}, spotifyTime);
+						doSomething();
+						//timer = setTimeout(function(){doSomething()}, spotifyTime);
 						var st = new Date().getTime() / 1000;
 						chrome.storage.sync.set({"startTime" : st});
 						chrome.storage.sync.set({"timing" : true});	
@@ -179,8 +208,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 				chrome.storage.sync.get("wastedTime", function(wT){
 					console.log("Wasted time: " + wT.wastedTime);
 					showNotification(wT.wastedTime);
-
-					setTimeout(function(){showNotification(wT.wastedTime)}, 1000);
 				});
 				chrome.storage.sync.set({"wastedTime" : 0});
 			}

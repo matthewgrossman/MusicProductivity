@@ -9,11 +9,12 @@ $(document).ready(function(){
       var spotifyClicked = $("#spotify").prop('checked');
       var soundClicked = $("#sound").prop('checked');
       var tabClicked = $("#close").prop('checked');
+      var rickRollClicked = $("#rickRoll").prop('checked');
 
       chrome.storage.sync.set({'enableSpotify': spotifyClicked});
       chrome.storage.sync.set({'enablePlaySound': soundClicked});
       chrome.storage.sync.set({'enableCloseTab': tabClicked});
-
+      chrome.storage.sync.set({'enableRickRoll': rickRollClicked});
     });
 });
 
@@ -52,6 +53,13 @@ function restore_options() {
     }
     var tabClicked = ret.enableCloseTab;
     $("#close").prop('checked', tabClicked);
+  });
+  chrome.storage.sync.get('enableRickRoll', function(ret){
+    if (!ret) {
+      return;
+    }
+    var rickClicked = ret.enableRickRoll;
+    $("#rickRoll").prop('checked', rickClicked);
   });
   
 }
