@@ -19,7 +19,7 @@
   },
 
   "background": {
-    "scripts": ["eventpage.js"],
+    "scripts": ["eventpage.js", "bg.js"],
     "persistent": false
   }
 }
