@@ -3,4 +3,4 @@ MusicProductivity
 Music Productivity Chrome Extension
 
 
-Garrison is the real scrub here - everyone
+If Matt shaved you could make a rug out of that hair - Kayne West
