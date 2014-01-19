@@ -14,12 +14,11 @@
   "options_page": "options.html",
 
   "browser_action": {
-    "default_icon":     "icon.png",
-    "default_popup":    "popup.html"
+    "default_icon":     "off.png"
   },
 
   "background": {
-    "scripts": ["eventpage.js", "bg.js"],
+    "scripts": ["js/jquery.min.js", "eventpage.js", "bg.js", "popup.js"],
     "persistent": false
   }
 }

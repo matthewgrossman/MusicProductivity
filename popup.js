@@ -1,4 +1,5 @@
 var isEnabaled = false;
+var state = 0;
 
 function saveOptions(state) {
     chrome.storage.sync.set({'state' : state});
@@ -6,11 +7,12 @@ function saveOptions(state) {
 
 function restoreOptions() {
     chrome.storage.sync.get("state", function( lastState) {
-        if (lastState.state==0) {
-            $("#off").prop('checked',true);
+        state = lastState.state;
+        if ( state==0) {
+            chrome.browserAction.setIcon({path:"off.png"}); 
         } 
         else {
-            $("#on").prop('checked',true);
+            chrome.browserAction.setIcon({path:"on.png"}); 
         }
     });
 };
@@ -18,9 +20,23 @@ function restoreOptions() {
 
 $(document).ready(function() {
     restoreOptions();
-    $("input").click(function(e) {
-        saveOptions( $(this).val() )
-        isEnabled = $(this).val()
+    chrome.browserAction.onClicked.addListener(function () {
+        if ( state == 0) {
+            state = 1;
+        }
+        else {
+            state = 0;
+        }
+        saveOptions( state);
+        isEnabled = state;
+        if (state == 0) {
+            chrome.browserAction.setIcon({path:"off.png"}); 
+            chrome.extension.sendMessage({action: "stateOff"});
+        } 
+        else {
+            chrome.browserAction.setIcon({path:"on.png"}); 
+            chrome.extension.sendMessage({action: "stateOn"});
+        }
     });
 });
 
