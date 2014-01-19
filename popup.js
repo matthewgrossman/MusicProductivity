@@ -1,5 +1,4 @@
-var isEnabaled = false;
-var state = 0;
+var state;
 
 
 
@@ -10,11 +9,14 @@ function saveOptions(state) {
 function restoreOptions() {
     chrome.storage.sync.get("state", function( lastState) {
         state = lastState.state;
-        if ( state==0) {
-            chrome.browserAction.setIcon({path:"off.png"}); 
+        if ( state==1) {
+            chrome.browserAction.setIcon({path:"on.png"}); 
+            chrome.extension.sendMessage({action: "stateOn"});
         } 
         else {
-            chrome.browserAction.setIcon({path:"on.png"}); 
+            state = 0;
+            chrome.browserAction.setIcon({path:"off.png"}); 
+            chrome.extension.sendMessage({action: "stateOff"});
         }
     });
 };

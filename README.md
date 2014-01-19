@@ -3,4 +3,4 @@ MusicProductivity
 Music Productivity Chrome Extension
 
 
-Matt is a scrub - Mackenzie
+Garrison is the real scrub here - everyone
