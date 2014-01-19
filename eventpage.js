@@ -5,9 +5,7 @@ var closeTabTimer;
 var timing = false;
 var currentTabId;
 
-//var isEnabled = true;
 chrome.storage.sync.set({"timing": false});
-//chrome.storage.sync.set({"wastedTime": 0});
 console.log("START");
 
 function didMatchURL(url, bannedURLS){
@@ -76,8 +74,6 @@ function stopTimers(showN, clearWastedTime){
 	console.log("Set Timing To False");
 	chrome.storage.sync.set({"timing" : false});
 	clearTimeout(timer);
-	
-	//clearTimeout(closeTabTimer);
 };
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -127,10 +123,6 @@ function checkTabChange(){
 						chrome.storage.sync.set({"timing" : true});	
 					}
 				});
-				
-				/*if(closeTabEnabled){
-					closeTabTimer = setTimeout(function(){closeTab()}, closeTabTime);
-				}*/	
 			} else {
 				console.log("Not On A Forbidden Site");
 				chrome.storage.sync.get("timing", function(t){
@@ -157,19 +149,7 @@ function checkOnUpdate(tabId, changeInfo, tab){
 	}	
 }
 
-function showNotification(wastedTime){
-	console.log("Inside Show Notification");
-	console.log("Waste Time: "+wastedTime);
-	var notification;
-	if(wastedTime > 5) {
-		notification = webkitNotifications.createNotification(
-			"off.png",
-			"Total Time Wasted:",
-			wastedTime
-		);
-		notification.show();
-	}				
-}
+
 
 //if productivity mode is turned on, pay attention for bad activities
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
@@ -192,17 +172,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 			console.log(timing);
 			if(timing){
 				console.log("Timer Was On");
-				/*var endTime = new Date().getTime() / 1000;
-				chrome.storage.sync.get("startTime", function(sT){
-					startTime = sT.startTime;
-					var elapsed = endTime - startTime;
-					chrome.storage.sync.get("wastedTime", function(wT){
-						var finalWastedTime = wT.wastedTime + elapsed;
-						showNotification(finalWastedTime);
-					})
-				});*/
-				stopTimers(true, true);
-				//chrome.storage.sync.set({"wastedTime" : 0});
+					stopTimers(true, true);
 			}
 			else {
 				console.log("Timer Was Off");
@@ -218,8 +188,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 
-// Notifications
-/*var notification;
 
 function timeToHHMMSS( sec_num) {
     var hours   = Math.floor(sec_num / 3600);
@@ -229,42 +197,26 @@ function timeToHHMMSS( sec_num) {
     if (hours   < 10) {hours   = "0"+hours;}
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}
-    else              {seconds = seconds | 0;}
+    seconds = Math.round(seconds)
     var time    = "Hours:"+hours+"  Minutes:"+minutes+"  Seconds:"+seconds;
     return time;
 }
 
+function showNotification(wastedTime){
+	console.log("Inside Show Notification");
+	console.log("Waste Time: "+wastedTime);
+	var notification;
+	if(wastedTime > 1) {
+		time = timeToHHMMSS(wastedTime);
+		notification = webkitNotifications.createNotification(
+			"logo.png",
+			"Total Time Wasted:",
+			time
+		);
+		notification.show();
+		setTimeout(function(){notification.cancel()}, 9000);
+	}				
+}
 
-chrome.extension.onMessage.addListener(
-function(request, sender, sendResponse) {
-    if (request.action == "stateOff"){
-        //updateWastedTime();
-        var endTime = new Date().getTime() / 1000;
-		chrome.storage.sync.set({"endTime" : endTime}); 
-		chrome.storage.sync.get("startTime", function(st){
-			startTime = st.startTime;
-			console.log("startTime: "+startTime);
-			var elapsed = endTime - startTime; 
-			chrome.storage.sync.get("wastedTime", function(wt){
-				chrome.storage.sync.set({"wastedTime": (wt.wastedTime + elapsed)});
-				chrome.storage.sync.get("wastedTime", function(wt){
-           		console.log("wasted time as app is turned off");
-           	 	console.log(wt.wastedTime);
-            	if( wt.wastedTime > 5) {
-                    time = timeToHHMMSS( wt.wastedTime);
-               		notification = webkitNotifications.createNotification(
-                    'off.png',
-                    'Total Time Wasted:',
-                    time 
-                );
-                notification.show();
-				setTimeout(function(){notification.cancel()}, 4000);
-                }
-                });
-			});
-		});
-		
-    }
-});*/
         
 
