@@ -118,26 +118,31 @@ function checkTabChange(){
 	});
 };
 
+function checkOnAct(tabs){
+	console.log("Checking tabChange onActivated");
+	checkTabChange();
+}
+
+function checkOnUpdate(tabId, changeInfo, tab){
+	if (changeInfo.status == "complete"){
+		console.log("Checking tabChange onUpdated");
+		checkTabChange();
+	}	
+}
+
 //if productivity mode is turned on, pay attention for bad activities
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse){
 	if(request.action == "stateOn"){
 		console.log("State On");
-		chrome.tabs.onActivated.addListener(function(tabs){
-			console.log("Checking tabChange onActivated");
-			checkTabChange();
-		});	
+		checkTabChange();
+		chrome.tabs.onActivated.addListener( checkOnAct );	
 
-		chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-			if (changeInfo.status == "complete"){
-				console.log("Checking tabChange onUpdated");
-				checkTabChange();
-			}	
-		});
+		chrome.tabs.onUpdated.addListener( checkOnUpdate );
 	}
 	else if(request.action == "stateOff"){
 		console.log("state off");
-		chrome.tabs.onActivated.removeListener();
-		chrome.tabs.onUpdated.removeListener();
+		chrome.tabs.onActivated.removeListener(checkOnAct);
+		chrome.tabs.onUpdated.removeListener(checkOnUpdate);
 	}
 });
 
